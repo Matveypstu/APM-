@@ -1,0 +1,32 @@
+#include <iostream>
+#include <fstream>
+#include <unordered_map>
+
+void generateDocument(const std::unordered_map<std::cxx11_string,std::__cxx11_string>& data,
+                      const std::__cxx11_string& templateFile,
+                      const std::__cxx11_string& outputFile) {
+
+    // Чтение шаблона
+    std::__cxx11_string content="";
+    { 
+      std ::ifstream in(templateFile);
+      content.assign((std ::istreambuf_iterator<char>(in)),
+                     (std ::istreambuf_iterator<char>()));
+      
+      for(const auto& pair:data){
+          size_t pos=0;
+          while((pos=content.find("{{"+pair.first+"}}"))!=std::__cxx11_string ::npos){
+              content.replace(pos,pair.first.length()+4,pair.second);
+          }
+      }
+      
+      // Запись результата
+      std ::ofstream out(outputFile);
+      out<<content;
+      out.close();
+      }
+}
+
+int main() {
+   // Данные для заполнения шаблона
+   std::
