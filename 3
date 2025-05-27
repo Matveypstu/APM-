@@ -1,0 +1,41 @@
+#include <iostream>
+#include <vector>
+#include <ctime>
+#include <fstream>
+
+struct Task {
+    std::string description;
+    time_t deadline; // UNIX timestamp
+};
+
+class TaskManager {
+public:
+    void addTask(const Task& task) { tasks.push_back(task); }
+
+    void checkDeadlines() const {
+        time_t now=time(0);
+        for(const auto& task:tasks){
+            double diff=difftime(task.deadline,now)/(60*60*24);
+            if(diff<=7 && diff>=0){
+                char buffer[80];
+                strftime(buffer,sizeof(buffer),"%Y-%m-%d",&task.deadline);
+                std::cout<<"Напоминание: "<<task.description<<" до срока осталось "<<diff<<" дней.\n";
+            }
+        }
+    }
+
+private:
+    std::vector<Task> tasks;
+};
+
+int main() {
+   TaskManager manager;
+
+   // Добавляем задачу на 5 дней позже текущей даты
+   time_t now=time(0);
+   time_t deadline=now + 5*24*60*60; // 5 дней
+
+   manager.addTask({"Подготовить договор", deadline});
+   
+   manager.checkDeadlines();
+}
