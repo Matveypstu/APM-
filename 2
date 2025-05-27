@@ -1,0 +1,53 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <unordered_map>
+#include <sstream>
+
+struct Decision {
+    int id;
+    std::string text;
+};
+
+class DecisionSearchEngine {
+public:
+    void indexDecisions(const std::vector<Decision>& decisions) {
+        for (const auto& dec : decisions) {
+            std::istringstream iss(dec.text);
+            std::string word;
+            while (iss >> word) {
+                index[word].push_back(dec.id);
+            }
+            decisionMap[dec.id]=dec.text;
+        }
+    }
+
+    void search(const std::string& keyword) const {
+        auto it=index.find(keyword);
+        if(it!=index.end()){
+            for(auto id:it->second){
+                std::cout<<"Решение ID "<<id<<": "<<decisionMap.at(id)<<std::endl;
+            }
+        } else{
+            std::cout<<"Нет решений по запросу.\n";
+        }
+    }
+
+private:
+    std::unordered_map<std::string,std::vector<int>> index;
+    std::unordered_map<int,std::string> decisionMap;
+};
+
+int main() {
+    // Инициализация базы решений
+    std::vector<Decision> decisions={
+       {1,"Решение по делу о нарушении договора."},
+       {2,"Обоснование отказа в иске."},
+       {3,"Обжалование решения суда."}
+   };
+
+   DecisionSearchEngine engine;
+   engine.indexDecisions(decisions);
+
+   engine.search("отказ");
+}
