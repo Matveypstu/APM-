@@ -1,0 +1,49 @@
+lass DocumentClassifier {
+public:
+    DocumentClassifier() {
+        // Инициализация ключевых слов для типов документов
+        categories["Договор"] = {"соглашение", "контракт", "обязательства"};
+        categories["Иск"] = {"истец", "ответчик", "иск"};
+        categories["Протокол"] = {"протокол", "заседание", "протокол заседания"};
+    }
+
+    std::string classify(const std::string& filename) {
+        std::ifstream file(filename);
+        if (!file.is_open()) return "Неизвестный";
+
+        std::string line;
+        std::map<std::string,int> scores;
+        for (const auto& cat : categories) {
+            scores[cat.first]=0;
+        }
+
+        while (std::getline(file, line)) {
+            for (const auto& cat : categories) {
+                for (const auto& keyword : cat.second) {
+                    if (line.find(keyword) != std::string::npos)
+                        scores[cat.first]++;
+                }
+            }
+        }
+
+        // Находим категорию с максимальным счетом
+        std::string result = "Не классифицирован";
+        int maxScore=0;
+        for (const auto& score : scores) {
+            if (score.second > maxScore) {
+                maxScore=score.second;
+                result=score.first;
+            }
+        }
+        return result;
+    }
+
+private:
+    std::map<std::string,std::vector<std::string>> categories;
+};
+
+int main() {
+    DocumentClassifier classifier;
+    std::string filename="документ.txt";
+    std::cout<<"Классификация документа: "<<classifier.classify(filename)<<std::endl;
+}
